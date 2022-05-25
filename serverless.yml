@@ -1,0 +1,86 @@
+service:
+  name: "accountService"
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+  - serverless-dynamodb-local
+
+custom:
+  webpack:
+      webpackConfig: ./webpack.config.js
+      includeModules: true
+  package:
+  individually: true  
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  timeout: 30
+  region: us-east-2
+  apiGateway:
+    restApiId: 3gz5o9gqmb
+    restApiRootResourceId: jrmd7494j2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource: arn:aws:sns:us-east-2:532362042466:delete-portador
+
+functions:
+  CreateAccount:
+    handler: src/functions/CreateAccount.handler
+    events:
+      - sqs:
+            arn: arn:aws:sqs:us-east-2:532362042466:create-account-fila
+  CreateOperation:
+    handler: src/functions/CreateOperation.handler
+    events:
+      - http:
+          path: account/createOperation
+          method: POST
+          cors: true
+  GetExtractByData:
+    handler: src/functions/GetExtractByData.handler
+    events:
+      - http:
+          path: account/getExtractByData
+          method: GET
+          request:
+            parameters:
+              querystrings:
+                startDate: true
+                endDate: true
+                cpf: true
+          cors: true
+  DeleteAccount:
+    handler: src/functions/DeleteAccount.handler
+    events:
+      - http:
+          path: account/deleteAccount
+          method: DELETE
+          request:
+            parameters:
+              querystrings:
+                cpf: true
+          cors: true
+  BlockOrDesblockAccount:
+    handler: src/functions/BlockOrDesblockAccount.handler
+    events:
+      - http:
+          path: account/blockOrDesblockAccount
+          method: PUT
+          cors: true
+  GetAccount:
+    handler: src/functions/GetAccount.handler
+    events:
+      - http:
+          path: account/getAccount
+          method: GET
+          cors: true
+                        
+
