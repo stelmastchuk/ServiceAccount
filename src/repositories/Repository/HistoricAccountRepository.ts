@@ -8,7 +8,7 @@ class HistoricAccountRepository implements IHistoricAccountRepository {
         return HistoricAccountRepositoryModel.create(entity)
     }
 
-    async getAccountHistoricByData(cpf: string, startDate: string, endDate: string): Promise<Partial<HistoricAccount>> {
+    async getAccountHistoricByData(cpf: string, startDate: string, endDate: string): Promise<Partial<HistoricAccount[]>> {
         const startDateTimeStamp = new Date(startDate).getTime()
         const endDateTimeStamp = new Date(endDate).getTime()
 
@@ -31,6 +31,27 @@ class HistoricAccountRepository implements IHistoricAccountRepository {
             }
         })
 
+    }
+
+    async getAccountHistoricPerDay(cpf: string, startDate: number, endDate: number): Promise<Partial<HistoricAccount[]>> {
+        const historic: any = await HistoricAccountRepositoryModel.query("cpf").
+            eq(cpf).
+            filter('dateCreation').ge(startDate).
+            filter('dateCreation').le(endDate).exec()
+
+        return historic.map((item: any) => {
+            return {
+                balanceMoved: item.balanceMoved,
+                accountId: item.accountId,
+                typeOperation: item.typeOperation,
+                updatedAt: item.updatedAt,
+                cpf: item.cpf,
+                createdAt: item.createdAt,
+                historicId: item.historicId,
+                dateCreation: item.dateCreation
+
+            }
+        })
     }
 }
 

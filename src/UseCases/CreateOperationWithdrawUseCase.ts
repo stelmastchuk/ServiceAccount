@@ -3,7 +3,8 @@ import { IAccountRepository } from '@repositories/Repository/IAccountRepository'
 import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAccountRepository';
 import { AppError } from 'src/errors/AppError';
 import { inject, injectable } from 'tsyringe';
-
+import * as DateFns from 'date-fns'
+import { HistoricAccount } from 'src/entities/HistoricAccount';
 
 @injectable()
 class CreateOperationWithdrawUseCase {
@@ -26,6 +27,8 @@ class CreateOperationWithdrawUseCase {
         if (!account.accountStatus) {
             throw new AppError("Account blocked!")
         }
+
+        await this.validateWithdrawPerDay(cpf)
 
         const balanceCalculator = account.balance - balanceMoved
 
@@ -54,6 +57,25 @@ class CreateOperationWithdrawUseCase {
         return updatedAccount && createHistoric
 
 
+    }
+
+    private async validateWithdrawPerDay(cpf: string): Promise<void> {
+
+        const now = new Date()
+
+        const startDay = DateFns.startOfDay(now).getTime()
+
+        const endDay = DateFns.endOfDay(now).getTime()
+
+        const accountHistoric: Partial<HistoricAccount>[] = await this.historicAccountRepository.getAccountHistoricPerDay(cpf, startDay, endDay)
+
+        const totalAmounWithdraw = accountHistoric.
+            map((item) => item.typeOperation === operationType.withdraw ? item.balanceMoved : 0).
+            reduce((ac, vt) => ac + vt, 0)
+
+        if (totalAmounWithdraw >= 2000) {
+            throw new AppError("Limit Withdraw : 2000")
+        }
     }
 }
 

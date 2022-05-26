@@ -15,6 +15,7 @@
   "dependencies": {
     "aws-sdk": "^2.1143.0",
     "cpf-cnpj-validator": "^1.0.3",
+    "date-fns": "^2.28.0",
     "dynamoose": "^2.8.5",
     "joi": "^17.6.0",
     "reflect-metadata": "^0.1.13",
