@@ -1,4 +1,4 @@
-import { operationType } from '@repositories/DTO/ICreateOperationDTO';
+import { operationType } from '../repositories/DTO/ICreateOperationDTO';
 import { IAccountRepository } from '@repositories/Repository/IAccountRepository';
 import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAccountRepository';
 import { AppError } from 'src/errors/AppError';

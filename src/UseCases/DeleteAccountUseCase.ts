@@ -21,22 +21,14 @@ class DeleteAccountUseCase {
         await this.snsService(cpf)
         return true
     }
-
-    private async snsService(cpf: string): Promise<boolean> {
-        let success = false
-        try {
-            const sns = new SNS()
-            const msg = { cpf }
-            await sns.publish({
-                TopicArn: `arn:aws:sns:us-east-2:532362042466:delete-portador`,
-                Subject: 'Delete Account',
-                Message: `${JSON.stringify(msg)}`
-            }).promise()
-            return success = true
-        } catch (error) {
-            console.log(error)
-        }
-        return true;
+    private async snsService(cpf: string): Promise<void> {
+        const sns = new SNS({ region: 'us-east-2' })
+        const msg = { cpf }
+        await sns.publish({
+            TopicArn: `arn:aws:sns:us-east-2:532362042466:delete-portador`,
+            Subject: 'Delete Account',
+            Message: `${JSON.stringify(msg)}`
+        }).promise()
     }
 }
 

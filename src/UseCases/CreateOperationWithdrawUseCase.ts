@@ -1,4 +1,4 @@
-import { operationType } from '@repositories/DTO/ICreateOperationDTO';
+import { operationType } from '../repositories/DTO/ICreateOperationDTO';
 import { IAccountRepository } from '@repositories/Repository/IAccountRepository';
 import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAccountRepository';
 import { AppError } from 'src/errors/AppError';
@@ -28,17 +28,17 @@ class CreateOperationWithdrawUseCase {
             throw new AppError("Account blocked!")
         }
 
-        await this.validateWithdrawPerDay(cpf)
-
         const balanceCalculator = account.balance - balanceMoved
 
         const validationWithdraw = Math.sign(balanceCalculator)
+
+        account.balance = balanceCalculator
 
         if (validationWithdraw === -1) {
             throw new AppError("Insufficient balance to complete the transaction!")
         }
 
-        account.balance = balanceCalculator
+        await this.validateWithdrawPerDay(cpf)
          
         const updatedAccount = !!await this.accountRepository.update({
             cpf: account.cpf,
@@ -74,7 +74,7 @@ class CreateOperationWithdrawUseCase {
             reduce((ac, vt) => ac + vt, 0)
 
         if (totalAmounWithdraw >= 2000) {
-            throw new AppError("Limit Withdraw : 2000")
+            throw new AppError("Limit Withdraw : per day 2000!")
         }
     }
 }
