@@ -1,6 +1,7 @@
 import { HistoricAccountRepositoryModel } from '@repositories/Models/HistoricAccountRepositoryModel';
 import { HistoricAccount } from 'src/entities/HistoricAccount';
 import { IHistoricAccountRepository } from './IHistoricAccountRepository';
+import * as DateFns from 'date-fns'
 
 class HistoricAccountRepository implements IHistoricAccountRepository {
 
@@ -9,8 +10,9 @@ class HistoricAccountRepository implements IHistoricAccountRepository {
     }
 
     async getAccountHistoricByData(cpf: string, startDate: string, endDate: string): Promise<Partial<HistoricAccount[]>> {
-        const startDateTimeStamp = new Date(startDate).getTime()
-        const endDateTimeStamp = new Date(endDate).getTime()
+        const startDateTimeStamp = DateFns.startOfDay (new Date(startDate).getTime()).getTime()
+        const endDateTimeStamp = DateFns.endOfDay (new Date(endDate).getTime()).getTime()
+        
 
         const historic: any = await HistoricAccountRepositoryModel.query("cpf").
             eq(cpf).
