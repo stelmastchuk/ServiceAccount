@@ -28,7 +28,7 @@ class BlockOrUnlockAccountController {
             const response = await blockOrDesblockAccountUseCase.execute(cpfvalidado, accountStatus)
 
             return {
-                statusCode: 201,
+                statusCode: 200,
                 body: JSON.stringify({ account: response ? 'account unlocked' : "account blocked"  }),
                 headers: { "Content-type": "application/json" },
             }

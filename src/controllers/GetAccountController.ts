@@ -29,7 +29,7 @@ class GetAccountController {
             const response = await getAccountUseCase.execute(cpfvalidado)
 
             return {
-                statusCode: 201,
+                statusCode: 200,
                 body: JSON.stringify({ response }),
                 headers: { "Content-type": "application/json" },
             }

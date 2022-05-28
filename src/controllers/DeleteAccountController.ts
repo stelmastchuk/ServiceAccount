@@ -21,7 +21,7 @@ class DeleteAccountController {
             const response = await deleteAccountUseCase.execute(cpfvalidado)
 
             return {
-                statusCode: 201,
+                statusCode: 200,
                 body: JSON.stringify({ accountDeleted: response }),
                 headers: { "Content-type": "application/json" },
             }
