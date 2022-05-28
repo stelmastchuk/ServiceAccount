@@ -41,6 +41,7 @@ class GetExtractByDataUseCase {
 
         const accountHistoricResponse = accountHistoric.map(item => {
             return {
+                transactionId: item.historicId,
                 balanceMoved: item.balanceMoved,
                 typeOperation: item.typeOperation,
                 updatedAt: new Date(item.updatedAt).getTime(),
