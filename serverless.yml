@@ -72,7 +72,7 @@ functions:
     handler: src/functions/BlockOrDesblockAccount.handler
     events:
       - http:
-          path: account/blockOrDesblockAccount
+          path: account/blockOrUnlockAccount
           method: PUT
           cors: true
   GetAccount:
