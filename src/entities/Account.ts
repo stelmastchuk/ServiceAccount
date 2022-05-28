@@ -7,6 +7,6 @@ export interface Account extends Document  {
     agencyAccount: number
     cpf: string
     accountStatus: boolean
-    createdAt?: Date
-    updatedAt?: Date
+    createdAt?: Date | number
+    updatedAt?: Date | number
 }

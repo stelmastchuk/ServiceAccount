@@ -9,8 +9,8 @@ export const mapAccount = (account: any): Partial<Account> | undefined => {
         agencyAccount: account[0].agencyAccount,
         cpf: account[0].cpf,
         accountStatus: account[0].accountStatus,
-        createdAt: account[0].createdAt,
-        updatedAt: account[0].updatedAt
+        createdAt: new Date(account[0].createdAt).getTime(),
+        updatedAt: new Date(account[0].updatedAt).getTime()
 
     } : undefined
 
