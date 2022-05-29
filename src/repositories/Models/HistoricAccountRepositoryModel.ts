@@ -2,6 +2,7 @@ import dynamoose from "dynamoose"
 import { ModelType } from 'dynamoose/dist/General'
 import { HistoricAccount } from 'src/entities/HistoricAccount';
 import { v4 as uuid } from 'uuid';
+import Datetimezone from 'date-fns-tz';
 
 const schema = new dynamoose.Schema({
     historicId: {
@@ -37,7 +38,7 @@ const schema = new dynamoose.Schema({
     dateCreation: {
         type: Number,
         rangeKey: true,
-        default: new Date().getTime()
+        default: new Date().getTime() + Datetimezone.getTimezoneOffset("America/Sao_Paulo")
     }
 },{
     "saveUnknown": true,

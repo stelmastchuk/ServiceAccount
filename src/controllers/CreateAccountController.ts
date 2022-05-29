@@ -12,8 +12,6 @@ class CreateAccountController {
         try {
             const data = sqsEventNormalizer(event, true) as ICreateAccountDTO
 
-            console.log("Teste DATA", data)
-
             const { error } = schemaCreateAccount.validate({ cpf: data.cpf })
 
             if (error) {

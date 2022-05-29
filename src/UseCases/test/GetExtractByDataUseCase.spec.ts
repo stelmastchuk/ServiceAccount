@@ -101,7 +101,7 @@ describe("Get Account", () => {
             findByCpf: jest.fn().mockImplementation(() => Promise.resolve(undefined))
         }
         const usecase = new GetExtractByDataUseCase(createAccountRepo, createHistoricAccountRepo)
-        const mockError = new AppError("Account not exists!")
+        const mockError = new AppError("Account not found!")
         await (expect(usecase.execute("42845684002", "2022-05-24", "2022-05-27"))).rejects.toEqual(mockError)
     });
 
@@ -116,6 +116,32 @@ describe("Get Account", () => {
         const usecase = new GetExtractByDataUseCase(createAccountRepo, createHistoricAccountRepo)
         const mockError = new AppError("Account blocked!")
         await (expect(usecase.execute("42845684002", "2022-05-24", "2022-05-27"))).rejects.toEqual(mockError)
+    });
+
+
+    it("should not be able to Withdraw Account, if startDate is invalid", async () => {
+        const createAccountRepo: jest.Mocked<IAccountRepository> = {
+            create: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            update: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            delete: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            findByCpf: jest.fn().mockImplementation(() => Promise.resolve(account))
+        }
+        const usecase = new GetExtractByDataUseCase(createAccountRepo, createHistoricAccountRepo)
+        const mockError = new AppError("Invalid startDate!")
+        await (expect(usecase.execute("42845684002", "2022-05-32", "2022-05-27"))).rejects.toEqual(mockError)
+    });
+
+
+    it("should not be able to Withdraw Account, if endDate is invalid", async () => {
+        const createAccountRepo: jest.Mocked<IAccountRepository> = {
+            create: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            update: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            delete: jest.fn().mockImplementation(() => Promise.resolve(account)),
+            findByCpf: jest.fn().mockImplementation(() => Promise.resolve(account))
+        }
+        const usecase = new GetExtractByDataUseCase(createAccountRepo, createHistoricAccountRepo)
+        const mockError = new AppError("Invalid endDate!")
+        await (expect(usecase.execute("42845684002", "2022-05-28", "2022-05-32"))).rejects.toEqual(mockError)
     });
 
 

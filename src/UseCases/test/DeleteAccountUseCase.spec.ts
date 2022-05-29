@@ -50,7 +50,7 @@ describe("Delete Account", () => {
             findByCpf: jest.fn().mockImplementation(() => Promise.resolve(undefined))
         }
         const usecase = new DeleteAccountUseCase(createAccountRepo)
-        const mockError = new AppError("Account not exists!")
+        const mockError = new AppError("Account not found!")
         await (expect(usecase.execute("42845684002"))).rejects.toEqual(mockError)
     });
 

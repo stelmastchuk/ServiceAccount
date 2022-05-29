@@ -15,7 +15,7 @@ class BlockOrUnlockAccountUseCase {
         const account = await this.accountRepository.findByCpf(cpf)
         
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!")
         }
 
         await this.accountRepository.update({

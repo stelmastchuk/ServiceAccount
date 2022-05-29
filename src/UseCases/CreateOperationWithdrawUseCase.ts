@@ -4,8 +4,9 @@ import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAc
 import { AppError } from 'src/errors/AppError';
 import { inject, injectable } from 'tsyringe';
 import * as DateFns from 'date-fns'
+import Datetimezone from 'date-fns-tz';
 import { HistoricAccount } from 'src/entities/HistoricAccount';
-
+import { ReturnOperation } from '@repositories/DTO/types';
 @injectable()
 class CreateOperationWithdrawUseCase {
 
@@ -16,12 +17,12 @@ class CreateOperationWithdrawUseCase {
         private historicAccountRepository: IHistoricAccountRepository
     ) { }
 
-    async execute(balanceMoved: number, cpf: string): Promise<any> {
+    async execute(balanceMoved: number, cpf: string): Promise<ReturnOperation> {
 
         const account = await this.accountRepository.findByCpf(cpf)
 
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!")
         }
 
         if (!account.accountStatus) {
@@ -38,7 +39,7 @@ class CreateOperationWithdrawUseCase {
             throw new AppError("Insufficient balance to complete the transaction!")
         }
 
-        await this.validateWithdrawPerDay(cpf)
+        await this.validateWithdrawPerDay(cpf, balanceMoved)
          
         const updatedAccount = !!await this.accountRepository.update({
             cpf: account.cpf,
@@ -52,29 +53,40 @@ class CreateOperationWithdrawUseCase {
             cpf: cpf,
             typeOperation: operationType.withdraw
         })
+        
+        const transactionSucces = !!(updatedAccount && createHistoric)
 
-
-        return updatedAccount && createHistoric
+        return {
+            transactionSucces: transactionSucces,
+            currentBalance: account.balance
+        }
 
 
     }
 
-    private async validateWithdrawPerDay(cpf: string): Promise<void> {
+    private async validateWithdrawPerDay(cpf: string, balancedMoved: number): Promise<void> {
 
-        const now = new Date()
+        const now = new Date().getTime() + Datetimezone.getTimezoneOffset("America/Sao_Paulo")
 
-        const startDay = DateFns.startOfDay(now).getTime()
+        const data = new Date(now).toISOString()
+        const dataformatted = data.split("T")
 
-        const endDay = DateFns.endOfDay(now).getTime()
+        const startDay = DateFns.startOfDay(new Date(dataformatted[0]).getTime()).getTime() -
+            Datetimezone.getTimezoneOffset("America/Sao_Paulo");
+
+        const endDay = DateFns.endOfDay(new Date(dataformatted[0]).getTime()).getTime() -
+            Datetimezone.getTimezoneOffset("America/Sao_Paulo");
 
         const accountHistoric: Partial<HistoricAccount>[] = await this.historicAccountRepository.getAccountHistoricPerDay(cpf, startDay, endDay)
 
         const totalAmounWithdraw = accountHistoric.
             map((item) => item.typeOperation === operationType.withdraw ? item.balanceMoved : 0).
             reduce((ac, vt) => ac + vt, 0)
-
-        if (totalAmounWithdraw >= 2000) {
-            throw new AppError("Limit Withdraw : per day 2000!")
+        
+        const withdrawalAvailable = 2000 - totalAmounWithdraw 
+        
+        if (balancedMoved > withdrawalAvailable) {
+            throw new AppError(`Insufficient balance, you can only withdraw more : $${withdrawalAvailable} today and $2000 Per Day!`)
         }
     }
 }

@@ -4,6 +4,7 @@ import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAc
 import { HistoricAccount } from 'src/entities/HistoricAccount';
 import { AppError } from 'src/errors/AppError';
 import { inject, injectable } from 'tsyringe';
+import { validateDate } from 'src/utils/dataValidated';
 
 @injectable()
 class GetExtractByDataUseCase {
@@ -18,8 +19,10 @@ class GetExtractByDataUseCase {
         
         const account = await this.accountRepository.findByCpf(cpf)
 
+        validateDate(startDate, endDate)
+
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!")
         }
 
         if (!account.accountStatus) {

@@ -4,6 +4,7 @@ import { IAccountRepository } from '@repositories/Repository/IAccountRepository'
 import { CreateOperationDepositUseCase } from '../CreateOperationDepositUseCase';
 import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAccountRepository';
 import { AppError } from 'src/errors/AppError';
+import { ReturnOperation } from '@repositories/DTO/types';
 
 
 describe("Create Operation Deposit", () => {
@@ -23,6 +24,11 @@ describe("Create Operation Deposit", () => {
         accountStatus: false,
         createdA: new Date(),
         updatedAt: new Date()
+    }
+
+    const returnMock: ReturnOperation = {
+        transactionSucces: true,
+        currentBalance: 1001
     }
 
     const createAccountRepo: jest.Mocked<IAccountRepository> = {
@@ -47,7 +53,7 @@ describe("Create Operation Deposit", () => {
     it("should be able to deposit in Account", async () => {
         const usecase = new CreateOperationDepositUseCase(createAccountRepo, createHistoricAccountRepo)
         const response = await usecase.execute(1000, "42845684002")
-        expect(response).toBe(true)
+        expect(response).toEqual(returnMock)
     });
 
 
@@ -59,7 +65,7 @@ describe("Create Operation Deposit", () => {
             findByCpf: jest.fn().mockImplementation(() => Promise.resolve(undefined))
         }
         const usecase = new CreateOperationDepositUseCase(createAccountRepo, createHistoricAccountRepo)
-        const mockError = new AppError("Account not exists!")
+        const mockError = new AppError("Account not found!")
         await (expect(usecase.execute(1000, "42845684002"))).rejects.toEqual(mockError)
     });
 

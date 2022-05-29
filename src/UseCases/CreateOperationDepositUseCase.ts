@@ -3,6 +3,7 @@ import { IAccountRepository } from '@repositories/Repository/IAccountRepository'
 import { IHistoricAccountRepository } from '@repositories/Repository/IHistoricAccountRepository';
 import { AppError } from 'src/errors/AppError';
 import { inject, injectable } from 'tsyringe';
+import { ReturnOperation } from '@repositories/DTO/types';
 
 
 @injectable()
@@ -15,12 +16,12 @@ class CreateOperationDepositUseCase {
          private historicAccountRepository: IHistoricAccountRepository
     ) { }
 
-    async execute(balanceMoved: number, cpf: string): Promise<boolean> {
+    async execute(balanceMoved: number, cpf: string): Promise<ReturnOperation> {
 
         const account = await this.accountRepository.findByCpf(cpf)
 
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!")
         }
 
         if (!account.accountStatus) {
@@ -48,7 +49,12 @@ class CreateOperationDepositUseCase {
         })
 
 
-        return updatedAccount && createHistoric
+        const transactionSucces = !!(updatedAccount && createHistoric)
+
+        return {
+            transactionSucces: transactionSucces,
+            currentBalance: account.balance
+        }
         
     }
 }

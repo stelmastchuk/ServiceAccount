@@ -6,6 +6,7 @@ import { validarCpf } from 'src/utils/validarcpf';
 import { treatError } from 'src/utils/errors';
 import { schemaCreateOperation } from 'src/utils/joiValidation';
 import { AppError } from 'src/errors/AppError';
+import { ReturnOperation } from '@repositories/DTO/types';
 
 class CreateOperationController {
 
@@ -23,14 +24,11 @@ class CreateOperationController {
 
             const cpfvalidado = validarCpf(cpf)
 
-            const operationUseCase = operationType.deposit === typeOperation ? container.resolve(CreateOperationDepositUseCase) :
-                container.resolve(CreateOperationWithdrawUseCase)
-
-            const response = await operationUseCase.execute(balanceMoved, cpfvalidado)
+            const response = await this.factoryOperation(typeOperation, cpfvalidado, balanceMoved)
 
             return {
                 statusCode: 201,
-                body: JSON.stringify({ succesOperation: response }),
+                body: JSON.stringify({ Operation: response }),
                 headers: { "Content-type": "application/json" },
             }
             
@@ -39,6 +37,19 @@ class CreateOperationController {
         }
 
     }
+
+    private async factoryOperation(typeOperation: string, cpf: string, balanceMoved: number): Promise<ReturnOperation> { 
+        switch (typeOperation) {
+            case operationType.deposit:
+                const responseDeposit = container.resolve(CreateOperationDepositUseCase)
+                return responseDeposit.execute(balanceMoved, cpf)
+            case operationType.withdraw:
+                const responseWithdraw = container.resolve(CreateOperationWithdrawUseCase)
+                return responseWithdraw.execute(balanceMoved, cpf)
+            default:
+                throw new AppError("Operation not found, SELECT: deposit or withdraw!")
+        }
+    } 
 
 }
 

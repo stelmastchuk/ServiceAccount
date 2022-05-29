@@ -6,6 +6,7 @@ import { CreateOperationWithdrawUseCase } from '../CreateOperationWithdrawUseCas
 import { HistoricAccount } from 'src/entities/HistoricAccount';
 import { operationType } from '../../repositories/DTO/ICreateOperationDTO';
 import { AppError } from 'src/errors/AppError';
+import { ReturnOperation } from '@repositories/DTO/types';
 
 
 describe("Create Operation Withdraw", () => {
@@ -75,7 +76,12 @@ describe("Create Operation Withdraw", () => {
             dateCreation: 2131232,
             createdAt: new Date(),
             updatedAt: new Date(),
-    }]
+        }]
+    
+    const returnMock: ReturnOperation = {
+        transactionSucces: true,
+        currentBalance: 0
+    }
 
     const createAccountRepo: jest.Mocked<IAccountRepository> = {
         create: jest.fn().mockImplementation(() => Promise.resolve(account)),
@@ -99,7 +105,7 @@ describe("Create Operation Withdraw", () => {
     it("should be able to Withdraw in Account", async () => {
         const usecase = new CreateOperationWithdrawUseCase(createAccountRepo, createHistoricAccountRepo)
         const response = await usecase.execute(1000, "42845684002")
-        expect(response).toBe(true)
+        expect(response).toEqual(returnMock)
     });
 
 
@@ -111,7 +117,7 @@ describe("Create Operation Withdraw", () => {
             findByCpf: jest.fn().mockImplementation(() => Promise.resolve(undefined))
         }
         const usecase = new CreateOperationWithdrawUseCase(createAccountRepo, createHistoricAccountRepo)
-        const mockError = new AppError("Account not exists!")
+        const mockError = new AppError("Account not found!")
         await (expect(usecase.execute(1000, "42845684002"))).rejects.toEqual(mockError)
     });
 
@@ -139,7 +145,6 @@ describe("Create Operation Withdraw", () => {
         await (expect(usecase.execute(1000, "42845684002"))).rejects.toEqual(mockError)
     });
 
-
     it("should not be able to deposit in Account, if account Limit Withdraw : per day 2000  ", async () => {
         const createAccountRepo: jest.Mocked<IAccountRepository> = {
             create: jest.fn().mockImplementation(() => Promise.resolve(account)),
@@ -153,7 +158,7 @@ describe("Create Operation Withdraw", () => {
             getAccountHistoricPerDay: jest.fn().mockImplementation(() => Promise.resolve(historicMock2))
         }
         const usecase = new CreateOperationWithdrawUseCase(createAccountRepo, createHistoricAccountRepo)
-        const mockError = new AppError("Limit Withdraw : per day 2000!")
+        const mockError = new AppError("Insufficient balance, you can only withdraw more : $0 today and $2000 Per Day!")
         await (expect(usecase.execute(1000, "42845684002"))).rejects.toEqual(mockError)
     });
 

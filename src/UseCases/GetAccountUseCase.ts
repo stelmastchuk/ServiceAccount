@@ -15,7 +15,7 @@ class GetAccountUseCase {
     async execute(cpf: string): Promise<Partial<Account>> {
         const account = await this.accountRepository.findByCpf(cpf)
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!!")
         }
         return account
     }

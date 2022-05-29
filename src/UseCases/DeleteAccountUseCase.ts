@@ -15,7 +15,7 @@ class DeleteAccountUseCase {
     async execute(cpf: string): Promise<boolean> {
         const account = await this.accountRepository.findByCpf(cpf)
         if (!account) {
-            throw new AppError("Account not exists!")
+            throw new AppError("Account not found!")
         }
         await this.accountRepository.delete(account.accountId)
         await this.snsService(cpf)

@@ -43,7 +43,7 @@ describe("Unlock Account", () => {
             findByCpf: jest.fn().mockImplementation(() => Promise.resolve(undefined))
         }
         const usecase = new BlockOrUnlockAccountUseCase(createAccountRepo)
-        const mockError =  new AppError("Account not exists!")
+        const mockError =  new AppError("Account not found!")
         await (expect(usecase.execute("42845684002", true))).rejects.toEqual(mockError)
     });
 
