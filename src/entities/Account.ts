@@ -2,6 +2,7 @@ import { Document } from 'dynamoose/dist/Document'
 
 export interface Account extends Document  {
     accountId?: string
+    issuerId: string
     balance: number
     accountNumber: number
     agencyAccount: number

@@ -1,45 +1,42 @@
-import { container } from 'tsyringe'
-import { validarCpf } from 'src/utils/validarcpf';
-import { treatError } from 'src/utils/errors';
-import { schemaCreateAccount } from 'src/utils/joiValidation';
-import { AppError } from 'src/errors/AppError';
-import { IGetAccountDTO } from '@repositories/DTO/IGetExtractByDataDTO copy 2';
-import { GetAccountUseCase } from 'src/UseCases/getAccountUseCase';
+import { container } from "tsyringe";
+import { validarCpf } from "src/utils/validarcpf";
+import { treatError } from "src/utils/errors";
+import { schemaCreateAccount } from "src/utils/joiValidation";
+import { AppError } from "src/errors/AppError";
+import { IGetAccountDTO } from "@repositories/DTO/IGetAccountDTO";
+import { GetAccountUseCase } from "src/UseCases/getAccountUseCase";
 
 class GetAccountController {
+  async handler(event: any): Promise<any> {
+    try {
+      const queryStringParameters =
+        "queryStringParameters" in event
+          ? event.queryStringParameters ?? {}
+          : {};
 
-    async handler(event: any): Promise<any> {
+      const { cpf } = queryStringParameters as IGetAccountDTO;
 
-        try {
+      const { error } = schemaCreateAccount.validate({ cpf: cpf });
 
-            const queryStringParameters = 'queryStringParameters' in event ? event.queryStringParameters ?? {} : {}
+      if (error) {
+        throw new AppError(error.message);
+      }
 
-            const { cpf } = queryStringParameters as IGetAccountDTO
+      const cpfvalidado = validarCpf(cpf);
 
-            const { error } = schemaCreateAccount.validate({ cpf: cpf })
+      const getAccountUseCase = container.resolve(GetAccountUseCase);
 
-            if (error) {
-                throw new AppError(error.message)
-            }
+      const response = await getAccountUseCase.execute(cpfvalidado);
 
-            const cpfvalidado = validarCpf(cpf)
-
-            const getAccountUseCase = container.resolve(GetAccountUseCase)
-
-            const response = await getAccountUseCase.execute(cpfvalidado)
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ response }),
-                headers: { "Content-type": "application/json" },
-            }
-
-        } catch (err) {
-            return treatError(err)
-        }
-
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ response }),
+        headers: { "Content-type": "application/json" },
+      };
+    } catch (err) {
+      return treatError(err);
     }
-
+  }
 }
 
-export { GetAccountController }
+export { GetAccountController };

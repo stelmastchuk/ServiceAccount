@@ -12,6 +12,9 @@ custom:
       includeModules: true
   package:
   individually: true  
+  authorizer:
+    type: CUSTOM
+    authorizerId: ${ssm:authorizerId}
 
 provider:
   name: aws
@@ -19,9 +22,27 @@ provider:
   timeout: 30
   region: us-east-2
   apiGateway:
-    restApiId: 3gz5o9gqmb
-    restApiRootResourceId: jrmd7494j2
+    restApiId: ${ssm:restApiId}
+    restApiRootResourceId: ${ssm:restApiRootResourceId}
   iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - SES:Publish
+        - SES:SendRawEmail
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - 's3:GetObject'
+        - 's3:PutObject'
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - 'ssm:GetParameter'
+        - 'ssm:GetParameters'
+        - 'ssm:GetParameterHistory'
+        - 'ssm:GetParametersByPath'
+        - 'ssm:DescribeParameters'
+      Resource: '*'
     - Effect: Allow
       Action:
         - dynamodb:*
@@ -29,14 +50,18 @@ provider:
     - Effect: Allow
       Action:
         - sns:Publish
-      Resource: arn:aws:sns:us-east-2:532362042466:delete-portador
+      Resource: ${ssm:topicSnsDeletePortador}
 
 functions:
   CreateAccount:
     handler: src/functions/CreateAccount.handler
     events:
       - sqs:
-            arn: arn:aws:sqs:us-east-2:532362042466:create-account-fila
+            arn: ${ssm:Sqs-create-account-fila}
+      - http:
+          path: account/create
+          method: POST
+          cors: true
   CreateOperation:
     handler: src/functions/CreateOperation.handler
     events:
@@ -44,6 +69,7 @@ functions:
           path: account/createOperation
           method: POST
           cors: true
+          authorizer: ${self:custom.authorizer}
   GetExtractByData:
     handler: src/functions/GetExtractByData.handler
     events:
@@ -57,6 +83,7 @@ functions:
                 endDate: true
                 cpf: true
           cors: true
+          authorizer: ${self:custom.authorizer}
   DeleteAccount:
     handler: src/functions/DeleteAccount.handler
     events:
@@ -68,6 +95,7 @@ functions:
               querystrings:
                 cpf: true
           cors: true
+          authorizer: ${self:custom.authorizer}
   BlockOrDesblockAccount:
     handler: src/functions/BlockOrDesblockAccount.handler
     events:
@@ -75,6 +103,7 @@ functions:
           path: account/blockOrUnlockAccount
           method: PUT
           cors: true
+          authorizer: ${self:custom.authorizer}
   GetAccount:
     handler: src/functions/GetAccount.handler
     events:
@@ -82,5 +111,6 @@ functions:
           path: account/getAccount
           method: GET
           cors: true
+          authorizer: ${self:custom.authorizer}
                         
 

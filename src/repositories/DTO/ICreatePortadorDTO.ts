@@ -1,5 +1,8 @@
 interface ICreateAccountDTO {
-    cpf: string;
+  cpf: string;
+  issuerId: string;
+  email: string;
+  name: string;
 }
 
-export { ICreateAccountDTO }
+export { ICreateAccountDTO };

@@ -1,4 +1,4 @@
 export type ReturnOperation = {
-    transactionSucces: boolean,
-    currentBalance: number
-}
+  transactionSucces: boolean;
+  currentBalance: number;
+};

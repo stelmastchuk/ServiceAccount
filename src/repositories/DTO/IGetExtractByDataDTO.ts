@@ -1,7 +1,7 @@
 interface IGetExtractByDataDTO {
-    cpf: string;
-    startDate: string,
-    endDate: string,
+  cpf: string;
+  startDate: string;
+  endDate: string;
 }
 
-export { IGetExtractByDataDTO }
+export { IGetExtractByDataDTO };

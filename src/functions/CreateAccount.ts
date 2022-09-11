@@ -1,15 +1,13 @@
-import { SQSEvent } from 'aws-lambda';
+import { SQSEvent } from "aws-lambda";
 import "reflect-metadata";
-import { CreateAccountController } from 'src/controllers/createAccountController';
+import { CreateAccountController } from "src/controllers/createAccountController";
 import "../containers/index";
 
 export const handler = async (event: SQSEvent) => {
+  console.log("EVENT", event);
 
-    console.log("EVENT", event)
+  const createPortadorController = new CreateAccountController();
+  const response = createPortadorController.handler(event);
 
-    const createPortadorController = new CreateAccountController()
-    const response = createPortadorController.handler(event)
-
-    return response
-
+  return response;
 };
