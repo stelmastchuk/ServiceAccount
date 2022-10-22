@@ -1,7 +1,7 @@
 import { container } from "tsyringe";
 import { validarCpf } from "src/utils/validarcpf";
 import { treatError } from "src/utils/errors";
-import { schemaCreateAccount } from "src/utils/joiValidation";
+import { schemaGetAccount } from "src/utils/joiValidation";
 import { AppError } from "src/errors/AppError";
 import { IGetAccountDTO } from "@repositories/DTO/IGetAccountDTO";
 import { GetAccountUseCase } from "src/UseCases/getAccountUseCase";
@@ -16,7 +16,7 @@ class GetAccountController {
 
       const { cpf } = queryStringParameters as IGetAccountDTO;
 
-      const { error } = schemaCreateAccount.validate({ cpf: cpf });
+      const { error } = schemaGetAccount.validate({ cpf: cpf });
 
       if (error) {
         throw new AppError(error.message);

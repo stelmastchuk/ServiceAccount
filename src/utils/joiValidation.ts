@@ -18,6 +18,11 @@ export const schemaCreateAccount = Joi.object({
   issuerId: Joi.string().required(),
   name: Joi.string().required(),
 });
+
+export const schemaGetAccount = Joi.object({
+  cpf: Joi.string().required(),
+});
+
 export const schemaBlockOrDesblockAccount = Joi.object({
   accountStatus: Joi.boolean().required().strict(),
   cpf: Joi.string().required(),
