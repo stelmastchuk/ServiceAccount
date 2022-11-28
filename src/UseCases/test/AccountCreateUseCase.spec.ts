@@ -28,7 +28,7 @@ describe("Create Account", () => {
 
   it("should be able to create a new Account", async () => {
     const usecase = new AccountCreateUseCase(createAccountRepo);
-    const response = await usecase.execute("42845684002");
+    const response = await usecase.execute("42845684002", "a", "a", "a");
     expect(response).toEqual(account);
   });
 });
